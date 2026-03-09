@@ -124,6 +124,7 @@ uvicorn app.main:app --reload
 ## 文档入口
 
 - [docs/发布说明.md](docs/发布说明.md)
+- [docs/架构设计/流程图.md](docs/架构设计/流程图.md)
 - [docs/架构设计/架构总图.md](docs/架构设计/架构总图.md)
 - [docs/架构设计/技术实施说明.md](docs/架构设计/技术实施说明.md)
 - [docs/架构设计/业务版项目说明.md](docs/架构设计/业务版项目说明.md)
