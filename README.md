@@ -54,7 +54,7 @@ skills/                   技能资产目录
 tests/                    测试目录
 ```
 
-更详细的中文目录说明见 [docs/目录总览.md](/Users/ming/CaiHub/docs/目录总览.md)。
+更详细的中文目录说明见 [docs/目录总览.md](docs/目录总览.md)。
 
 ## 当前核心能力
 
@@ -123,16 +123,16 @@ uvicorn app.main:app --reload
 
 ## 文档入口
 
-- [docs/发布说明.md](/Users/ming/CaiHub/docs/发布说明.md)
-- [docs/架构设计/架构总图.md](/Users/ming/CaiHub/docs/架构设计/架构总图.md)
-- [docs/架构设计/技术实施说明.md](/Users/ming/CaiHub/docs/架构设计/技术实施说明.md)
-- [docs/架构设计/业务版项目说明.md](/Users/ming/CaiHub/docs/架构设计/业务版项目说明.md)
-- [docs/架构设计/README.md](/Users/ming/CaiHub/docs/架构设计/README.md)
-- [docs/数据契约/README.md](/Users/ming/CaiHub/docs/数据契约/README.md)
-- [docs/数据流/README.md](/Users/ming/CaiHub/docs/数据流/README.md)
-- [docs/智能体/README.md](/Users/ming/CaiHub/docs/智能体/README.md)
-- [docs/技能/README.md](/Users/ming/CaiHub/docs/技能/README.md)
-- [docs/旧仓库复用分析.md](/Users/ming/CaiHub/docs/旧仓库复用分析.md)
+- [docs/发布说明.md](docs/发布说明.md)
+- [docs/架构设计/架构总图.md](docs/架构设计/架构总图.md)
+- [docs/架构设计/技术实施说明.md](docs/架构设计/技术实施说明.md)
+- [docs/架构设计/业务版项目说明.md](docs/架构设计/业务版项目说明.md)
+- [docs/架构设计/README.md](docs/架构设计/README.md)
+- [docs/数据契约/README.md](docs/数据契约/README.md)
+- [docs/数据流/README.md](docs/数据流/README.md)
+- [docs/智能体/README.md](docs/智能体/README.md)
+- [docs/技能/README.md](docs/技能/README.md)
+- [docs/旧仓库复用分析.md](docs/旧仓库复用分析.md)
 
 ## 下一步建议
 
