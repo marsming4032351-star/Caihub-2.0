@@ -1,0 +1,1 @@
+"""Vision data contracts."""

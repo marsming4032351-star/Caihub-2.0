@@ -1,0 +1,1 @@
+"""CaiHub backend application package."""
