@@ -49,6 +49,7 @@ def test_create_list_and_build_data_assets(tmp_path: Path) -> None:
                 "quality_summary": "No production events available yet.",
                 "ops_summary": "1 operation snapshots available for SOP analysis.",
                 "knowledge_refs": ["ops/snapshot/SH-001"],
+                "lineage": {"production_event_ids": [], "operation_snapshot_ids": ["snapshot-1"]},
                 "training_value_score": 0.15,
                 "api_export_ready": False
             },

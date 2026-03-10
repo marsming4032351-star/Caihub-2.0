@@ -11,6 +11,7 @@ class DataAssetCreate(BaseModel):
     ops_summary: str = Field(min_length=1, max_length=4000)
     marketing_summary: str | None = Field(default=None, max_length=4000)
     knowledge_refs: list[str] = Field(default_factory=list)
+    lineage: dict[str, list[str]] = Field(default_factory=dict)
     training_value_score: float = Field(ge=0.0, le=1.0)
     api_export_ready: bool = False
 
@@ -25,6 +26,7 @@ class DataAssetRead(BaseModel):
     ops_summary: str
     marketing_summary: str | None
     knowledge_refs: list[str]
+    lineage: dict[str, list[str]]
     training_value_score: float
     api_export_ready: bool
     created_at: datetime
@@ -44,9 +46,15 @@ class DataAssetMaterializationRequest(BaseModel):
     asset_type: str | None = Field(default=None, max_length=64)
     marketing_summary: str | None = Field(default=None, max_length=4000)
     knowledge_refs: list[str] = Field(default_factory=list)
+    include_lineage: bool = True
     api_export_ready: bool = False
 
 
 class DataAssetMaterializationPreview(BaseModel):
     asset_payload: DataAssetCreate
     rationale: list[str] = Field(default_factory=list)
+
+
+class DataAssetLineageSummary(BaseModel):
+    production_event_ids: list[str] = Field(default_factory=list)
+    operation_snapshot_ids: list[str] = Field(default_factory=list)

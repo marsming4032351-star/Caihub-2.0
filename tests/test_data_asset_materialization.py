@@ -46,7 +46,9 @@ def test_preview_and_materialize_data_asset(tmp_path: Path) -> None:
         preview = preview_response.json()
         assert preview["asset_payload"]["asset_type"] == "restaurant-knowledge-pack"
         assert preview["asset_payload"]["api_export_ready"] is True
-        assert len(preview["rationale"]) >= 2
+        assert "operation_snapshot_ids" in preview["asset_payload"]["lineage"]
+        assert len(preview["asset_payload"]["lineage"]["operation_snapshot_ids"]) == 1
+        assert len(preview["rationale"]) >= 3
 
         materialize_response = client.post(
             "/api/v1/data-assets/materialize",
@@ -60,6 +62,7 @@ def test_preview_and_materialize_data_asset(tmp_path: Path) -> None:
         materialized = materialize_response.json()
         assert materialized["asset_type"] == "restaurant-knowledge-pack"
         assert materialized["api_export_ready"] is True
+        assert len(materialized["lineage"]["operation_snapshot_ids"]) == 1
 
         list_response = client.get("/api/v1/data-assets")
         assert list_response.status_code == 200
