@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.v1.endpoints.data_assets import router as data_assets_router
 from app.api.v1.endpoints.dishes import router as dishes_router
 from app.api.v1.endpoints.health import router as health_router
 from app.api.v1.endpoints.operations import router as operations_router
@@ -13,6 +14,7 @@ from app.api.v1.endpoints.vision import router as vision_router
 router = APIRouter()
 router.include_router(health_router, tags=["health"])
 router.include_router(dishes_router, prefix="/dishes", tags=["dishes"])
+router.include_router(data_assets_router, prefix="/data-assets", tags=["data-assets"])
 router.include_router(stores_router, prefix="/stores", tags=["stores"])
 router.include_router(operators_router, prefix="/operators", tags=["operators"])
 router.include_router(operations_router, prefix="/operations", tags=["operations"])

@@ -1,4 +1,5 @@
 from app.db.base import Base
+from app.models import data_asset  # noqa: F401
 from app.models import dish  # noqa: F401
 from app.models import operation_snapshot  # noqa: F401
 from app.models import operator  # noqa: F401

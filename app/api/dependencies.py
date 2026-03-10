@@ -7,6 +7,7 @@ from app.core.config import get_settings
 from app.db.session import get_session_factory
 from app.repositories.dish import DishRepository
 from app.agents.runtime import AgentRuntimeService
+from app.repositories.data_asset import DataAssetRepository
 from app.repositories.operations import StoreOperationSnapshotRepository
 from app.repositories.operator import OperatorRepository
 from app.repositories.production_event import ProductionEventRepository
@@ -14,6 +15,7 @@ from app.repositories.standard import DishStandardRepository
 from app.repositories.store import StoreRepository
 from app.services.architecture import ArchitectureService
 from app.services.dishes import DishService
+from app.services.data_assets import DataAssetService
 from app.services.operations import OperationsService
 from app.services.operators import OperatorService
 from app.services.orchestration import OrchestrationService
@@ -106,6 +108,20 @@ def get_operations_service(
     repository: StoreOperationSnapshotRepository = Depends(get_operations_repository),
 ) -> OperationsService:
     return OperationsService(repository)
+
+
+def get_data_asset_repository(
+    session: Session = Depends(get_db_session),
+) -> DataAssetRepository:
+    return DataAssetRepository(session)
+
+
+def get_data_asset_service(
+    repository: DataAssetRepository = Depends(get_data_asset_repository),
+    production_repository: ProductionEventRepository = Depends(get_production_event_repository),
+    operations_repository: StoreOperationSnapshotRepository = Depends(get_operations_repository),
+) -> DataAssetService:
+    return DataAssetService(repository, production_repository, operations_repository)
 
 
 def get_system_service() -> SystemService:
