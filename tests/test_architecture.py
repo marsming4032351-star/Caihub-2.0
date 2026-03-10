@@ -26,30 +26,36 @@ def test_system_architecture_blueprint(tmp_path: Path) -> None:
 
         assert response.status_code == 200
         body = response.json()
-        assert any("事件优先" in principle for principle in body["core_principles"])
+        assert any("AI 运营系统" in principle for principle in body["core_principles"])
         assert "catalog" in body["mesh_domains"]
         assert "production" in body["mesh_domains"]
+        assert "asset" in body["mesh_domains"]
         assert any(
-            contract["product"] == "dish_catalog"
+            contract["product"] == "restaurant_data_asset"
             for contract in body["data_contracts"]
         )
         assert any(
-            contract["product"] == "dish_production_event"
+            contract["product"] == "system_blueprint"
+            and contract["version"] == "v2"
             for contract in body["data_contracts"]
         )
         assert any(
-            agent["agent_id"] == "backend-architect"
+            agent["agent_id"] == "ceo-agent"
             for agent in body["agents"]
         )
         assert any(
-            agent["agent_id"] == "quality-judge"
+            agent["agent_id"] == "vision-qa-agent"
             for agent in body["agents"]
         )
         assert any(
-            skill["skill_id"] == "contract-governance"
+            skill["skill_id"] == "agent-coordination"
             for skill in body["skills"]
         )
         assert any(
-            skill["skill_id"] == "quality-rule-engine"
+            skill["skill_id"] == "asset-modeling"
             for skill in body["skills"]
+        )
+        assert any(
+            flow["flow_id"] == "asset_to_ceo_and_ecosystem"
+            for flow in body["data_flows"]
         )

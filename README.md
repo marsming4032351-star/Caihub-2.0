@@ -1,79 +1,182 @@
-# CaiHub 后端仓库
+# CaiHub AI Company
 
-CaiHub 是一个面向餐饮标准化、出品事件沉淀和数据资产治理的后端基础仓库。
+CaiHub 是一个面向餐饮行业的 **AI 运营系统**。
 
-当前版本已经完成第一阶段平台骨架，核心关注点包括：
-
-- 菜品、标准、出品事件三条主链路
-- Data Mesh 视角的数据域与数据流
-- 显式数据契约
-- agent / skill 的治理边界
-- Alembic 迁移基础设施
+它不是单纯的菜品识别工具，也不只是一个后厨质检 SaaS。CaiHub 的目标是用 AI Agent 复刻并增强餐厅运营体系，把经验、流程和判断沉淀成可复用的数据资产。
 
 一句话概括：
 
 ```text
-CaiHub 不是只做菜品识别，而是在搭一个以标准、事件和数据资产为核心的餐饮智能平台底座。
+CaiHub 不是在做一个识别 demo，而是在构建餐饮行业的 AI 原生运营基础设施。
 ```
 
-## 当前状态
+## 核心定义
 
-- 阶段：`v0.1.0`
-- 类型：后端基础仓 / 平台骨架
-- 已完成：API、标准、出品事件、最小质检裁决、架构蓝图、迁移基础设施
-- 测试状态：`pytest` 通过
+CaiHub 可以被定义为：
 
-## 项目亮点
+- 餐饮行业的 AI 运营系统
+- 以 Agent 协作驱动的餐厅数字组织
+- 以数据资产沉淀为终局的餐饮智能平台
 
-- 事件优先：先建模真实出品事件，再建模识别结果
-- 标准驱动：质量裁决依赖菜品标准，而不是写死在接口层
-- 契约治理：平台内置数据契约、数据流和系统蓝图
-- 平台扩展：提前预留 agent / skill 扩展结构
-- 工程落地：已经接入 Alembic、测试和基础服务分层
+核心思想：
 
-## 中文目录展示
+```text
+用 AI Agent 复刻餐厅运营体系，让餐饮经验变成数据资产。
+```
+
+## AI Company 组织结构
+
+```text
+Mars（Founder）
+  │
+  ▼
+CaiHub CEO Agent
+  │
+  ├── Vision QA Agent（CaiBox）
+  ├── Menu R&D Agent
+  ├── Store Ops Agent
+  ├── Marketing Agent
+  └── Data Asset Agent
+```
+
+### 各 Agent 职责
+
+- **CaiHub CEO Agent**
+  - 统筹目标、协同各业务 Agent、形成组织级决策摘要
+- **Vision QA Agent（CaiBox）**
+  - 负责视觉质检、异常发现、多模态采集协调
+- **Menu R&D Agent**
+  - 负责菜单研发、菜品标准沉淀、研发迭代建议
+- **Store Ops Agent**
+  - 负责门店执行、SOP 稳定性、运营优化建议
+- **Marketing Agent**
+  - 负责增长、内容、活动与品牌传播策略
+- **Data Asset Agent**
+  - 负责数据沉淀、知识结构化、资产建模与输出
+
+## 技术架构
+
+### Layer 1 — Hardware Layer
+
+设备输入层，包括：
+
+- CaiBox
+- 摄像头
+- 照度系统
+- 温度传感器
+
+### Layer 2 — Vision Layer
+
+视觉理解层，包括：
+
+- 色泽识别
+- 摆盘识别
+- 食材识别
+- 比例识别
+
+### Layer 3 — Agent Layer
+
+运营决策层，包括：
+
+- Kitchen / Vision QA Agent
+- Menu R&D Agent
+- Store Ops Agent
+- Marketing Agent
+- CEO Agent
+
+### Layer 4 — Data Asset Layer
+
+沉淀内容包括：
+
+- 菜品数据
+- 厨房模型
+- 门店运营数据
+- 菜单研发知识
+- 质量事件历史
+
+最终形成：
+
+- 餐饮行业数据资产
+- 可复用的运营模型
+- 可扩展的 API 与生态能力
+
+## 当前仓库定位
+
+当前仓库仍然是 **第一阶段后端基础仓**，但方向已经明确对齐到上面的最终架构。
+
+当前已落地的骨架包括：
+
+- FastAPI 后端服务
+- 菜品、标准、出品事件三条主链路
+- 最小质检裁决闭环
+- Data Mesh 视角的数据契约与数据流
+- agent / skill 注册与治理骨架
+- Alembic 迁移基础设施
+
+也就是说：
+
+```text
+当前代码实现的是 AI Company 的平台底座，不是最终完整形态。
+```
+
+## 当前目录
 
 ```text
 app/                      应用主目录
   api/                    接口层
-  agents/                 智能体注册表
-  core/                   核心配置与应用装配
+  agents/                 Agent 注册表
+  core/                   应用工厂、配置、生命周期
   db/                     数据库连接与初始化
-  domains/                领域模块与数据契约
+  domains/                领域契约
   events/                 领域事件
-  mesh/                   Data Mesh 元数据注册
+  mesh/                   数据契约与数据流注册
   models/                 ORM 模型
   repositories/           数据访问层
-  schemas/                API 与架构模型
-  services/               应用服务层
-  skills/                 技能注册表
-  vision/                 视觉识别能力
-agents/                   智能体资产目录
+  schemas/                API 与架构响应模型
+  services/               业务与架构服务层
+  skills/                 Skill 注册表
+  vision/                 视觉识别组件
+agents/                   Agent 资产目录
 docs/                     中文文档目录
-skills/                   技能资产目录
+migrations/               Alembic 迁移
+skills/                   Skill 资产目录
 tests/                    测试目录
 ```
 
-更详细的中文目录说明见 [docs/目录总览.md](docs/目录总览.md)。
+## 当前 API
 
-## 当前核心能力
+- `GET /api/v1/health`
+- `GET /api/v1/system/info`
+- `GET /api/v1/system/architecture`
+- `GET /api/v1/dishes`
+- `POST /api/v1/dishes`
+- `GET /api/v1/standards`
+- `POST /api/v1/standards`
+- `GET /api/v1/production/events`
+- `POST /api/v1/production/events`
+- `POST /api/v1/vision/dish-recognition`
 
-- 菜品主数据管理
-- 菜品标准管理
-- 出品事件采集与查询
-- 基于标准的最小质量裁决
-- 系统架构蓝图接口
-- 数据契约与数据流注册
-- 视觉识别接口
-- Alembic 数据库迁移
+## 商业逻辑
 
-当前仓库同时保留“技术分层”和“领域分域”两种组织方式，目的不是做复杂化，而是为后续拆成真正的数据产品保留边界。
+CaiHub 的商业模式由四层组成：
 
-当前已经吸收旧版架构仓的几个关键理念：
+- **设备收入**：CaiBox
+- **软件订阅**：质检、标准、运营 Agent 服务
+- **数据资产平台**：沉淀行业模型与知识资产
+- **API 生态**：向餐饮 SaaS、品牌、供应链系统开放能力
 
-- 先建模“真实出品事件”，再建模识别结果
-- 识别只负责“这是什么”，裁决由规则和标准完成
-- Agent 负责编排，Skill 负责能力封装与治理
+最终目标：
+
+```text
+形成餐饮行业 AI 数据平台。
+```
+
+## 关键原则
+
+- 先采集真实运营事件，再做 AI 解读
+- 先沉淀标准和规则，再放大 Agent 决策
+- 先形成数据资产闭环，再扩张生态接口
+- 识别负责观察，裁决负责判断，Agent 负责编排
 
 ## 运行方式
 
@@ -83,7 +186,7 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-默认数据库目标是 PostgreSQL。先执行 Alembic 迁移，再启动服务：
+数据库迁移并启动：
 
 ```bash
 export CAIHUB_DATABASE_URL="postgresql+psycopg://postgres:postgres@localhost:5432/caihub"
@@ -91,54 +194,17 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-如果你只是在本地快速跑测试型环境，也可以显式开启自动建表：
+本地快速测试环境：
 
 ```bash
 export CAIHUB_AUTO_CREATE_TABLES=true
 uvicorn app.main:app --reload
 ```
 
-## 当前 API
-
-- `GET /api/v1/health`
-  服务健康检查
-- `GET /api/v1/system/info`
-  平台基础信息
-- `GET /api/v1/system/architecture`
-  平台架构蓝图，返回数据域、契约、数据流、agents、skills
-- `GET /api/v1/dishes`
-  查询菜品列表
-- `POST /api/v1/dishes`
-  创建菜品
-- `GET /api/v1/production/events`
-  查询出品事件
-- `POST /api/v1/production/events`
-  创建出品事件并按菜品标准执行质检规则
-- `GET /api/v1/standards`
-  查询菜品标准
-- `POST /api/v1/standards`
-  创建菜品标准
-- `POST /api/v1/vision/dish-recognition`
-  基于 OpenCV 的菜品识别
-
-## 文档入口
-
-- [docs/发布说明.md](docs/发布说明.md)
-- [docs/架构设计/流程图.md](docs/架构设计/流程图.md)
-- [docs/架构设计/架构总图.md](docs/架构设计/架构总图.md)
-- [docs/架构设计/技术实施说明.md](docs/架构设计/技术实施说明.md)
-- [docs/架构设计/业务版项目说明.md](docs/架构设计/业务版项目说明.md)
-- [docs/架构设计/README.md](docs/架构设计/README.md)
-- [docs/数据契约/README.md](docs/数据契约/README.md)
-- [docs/数据流/README.md](docs/数据流/README.md)
-- [docs/智能体/README.md](docs/智能体/README.md)
-- [docs/技能/README.md](docs/技能/README.md)
-- [docs/旧仓库复用分析.md](docs/旧仓库复用分析.md)
-
-## 下一步建议
+## 下一步重点
 
 - 建立 `store` / `operator` 领域
-- 把字符串关联升级成真实关系模型
-- 为订单、商户、用户建立独立领域和契约
-- 引入事件总线，让 `app/events` 从定义层走向真实发布
-- 增加契约兼容性测试和 schema 导出流程
+- 升级关系模型与规则引擎
+- 接入真实事件总线
+- 推进 Agent runtime，而不只停留在注册层
+- 让数据回流形成可分析、可训练、可复用的数据资产

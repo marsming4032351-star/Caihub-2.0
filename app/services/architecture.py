@@ -11,11 +11,11 @@ class ArchitectureService:
         domains = sorted({contract.domain for contract in contracts})
         return ArchitectureBlueprintResponse(
             core_principles=[
-                "事件优先：系统围绕真实出品事件建模，而不是围绕单张图片建模。",
-                "多模态采集：视觉、重量、温度、时间共同构成有效判断输入。",
-                "模型与规则分离：识别负责对齐语义，裁决由标准与规则引擎完成。",
-                "数据资产沉淀：每次出品都应转化为可追溯、可复用的数据资产。",
-                "Agent 负责编排，Skill 负责能力封装，并通过契约受治理。",
+                "先采集真实运营事件，再做 AI 解读。",
+                "先沉淀标准和规则，再放大 Agent 决策。",
+                "识别负责观察，裁决负责判断，Agent 负责编排。",
+                "每次出品、运营和营销动作都应转化为可复用的数据资产。",
+                "CaiHub 的目标不是单点工具，而是餐饮行业的 AI 运营系统。",
             ],
             mesh_domains=domains,
             data_contracts=contracts,
