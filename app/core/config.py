@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = Field(default="CaiHub Backend", alias="CAIHUB_APP_NAME")
+    app_name: str = Field(default="CaiHub AI Company", alias="CAIHUB_APP_NAME")
     app_version: str = Field(default="0.1.0", alias="CAIHUB_APP_VERSION")
     environment: Literal["development", "staging", "production"] = Field(
         default="development",

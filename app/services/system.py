@@ -12,4 +12,6 @@ class SystemService:
             version=self.settings.app_version,
             environment=self.settings.environment,
             debug=self.settings.debug,
+            system_type="restaurant-ai-operating-system",
+            architecture_stage="foundation-with-runtime-skeleton",
         )

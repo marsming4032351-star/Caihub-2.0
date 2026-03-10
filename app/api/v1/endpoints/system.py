@@ -1,9 +1,15 @@
 from fastapi import APIRouter
 from fastapi import Depends
 
-from app.api.dependencies import get_architecture_service, get_system_service
+from app.api.dependencies import (
+    get_agent_runtime_service,
+    get_architecture_service,
+    get_system_service,
+)
+from app.schemas.agent_runtime import AgentRuntimeOverview
 from app.schemas.architecture import ArchitectureBlueprintResponse
 from app.schemas.system import SystemInfoResponse
+from app.agents.runtime import AgentRuntimeService
 from app.services.architecture import ArchitectureService
 from app.services.system import SystemService
 
@@ -26,3 +32,14 @@ async def system_architecture(
     service: ArchitectureService = Depends(get_architecture_service),
 ) -> ArchitectureBlueprintResponse:
     return service.get_blueprint()
+
+
+@router.get(
+    "/agent-runtime",
+    response_model=AgentRuntimeOverview,
+    summary="Agent runtime 概览",
+)
+async def system_agent_runtime(
+    service: AgentRuntimeService = Depends(get_agent_runtime_service),
+) -> AgentRuntimeOverview:
+    return service.get_overview()

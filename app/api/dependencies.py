@@ -6,13 +6,18 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.db.session import get_session_factory
 from app.repositories.dish import DishRepository
+from app.agents.runtime import AgentRuntimeService
+from app.repositories.operator import OperatorRepository
 from app.repositories.production_event import ProductionEventRepository
 from app.repositories.standard import DishStandardRepository
+from app.repositories.store import StoreRepository
 from app.services.architecture import ArchitectureService
 from app.services.dishes import DishService
+from app.services.operators import OperatorService
 from app.services.production import ProductionEventService
 from app.services.quality import QualityRuleService
 from app.services.standards import DishStandardService
+from app.services.stores import StoreService
 from app.services.system import SystemService
 
 
@@ -64,9 +69,37 @@ def get_production_event_service(
     return ProductionEventService(repository, quality_service, standard_service)
 
 
+def get_store_repository(
+    session: Session = Depends(get_db_session),
+) -> StoreRepository:
+    return StoreRepository(session)
+
+
+def get_store_service(
+    repository: StoreRepository = Depends(get_store_repository),
+) -> StoreService:
+    return StoreService(repository)
+
+
+def get_operator_repository(
+    session: Session = Depends(get_db_session),
+) -> OperatorRepository:
+    return OperatorRepository(session)
+
+
+def get_operator_service(
+    repository: OperatorRepository = Depends(get_operator_repository),
+) -> OperatorService:
+    return OperatorService(repository)
+
+
 def get_system_service() -> SystemService:
     return SystemService(get_settings())
 
 
 def get_architecture_service() -> ArchitectureService:
     return ArchitectureService()
+
+
+def get_agent_runtime_service() -> AgentRuntimeService:
+    return AgentRuntimeService()

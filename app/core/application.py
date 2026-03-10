@@ -9,7 +9,7 @@ def create_application() -> FastAPI:
     settings = get_settings()
     application = FastAPI(
         title=settings.app_name,
-        description="Backend API for the CaiHub platform.",
+        description="API foundation for the CaiHub restaurant AI operating system.",
         debug=settings.debug,
         version=settings.app_version,
         docs_url="/docs",

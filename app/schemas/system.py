@@ -8,3 +8,5 @@ class SystemInfoResponse(BaseModel):
     version: str
     environment: Literal["development", "staging", "production"]
     debug: bool
+    system_type: str
+    architecture_stage: str
