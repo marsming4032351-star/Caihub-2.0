@@ -265,6 +265,15 @@ export CAIHUB_AUTO_CREATE_TABLES=true
 uvicorn app.main:app --reload
 ```
 
+## 文档入口
+
+- [OpenClaw 日报发信配置](docs/架构设计/OpenClaw_日报发信配置.md)
+- [OpenClaw 日报补发方案](docs/架构设计/OpenClaw_日报补发方案.md)
+- [流程图](docs/架构设计/流程图.md)
+- [架构总图](docs/架构设计/架构总图.md)
+- [技术实施说明](docs/架构设计/技术实施说明.md)
+- [业务版项目说明](docs/架构设计/业务版项目说明.md)
+
 ## 下一步重点
 
 - 建立 `store` / `operator` 领域
