@@ -148,13 +148,77 @@ tests/                    测试目录
 - `GET /api/v1/health`
 - `GET /api/v1/system/info`
 - `GET /api/v1/system/architecture`
+- `GET /api/v1/system/agent-runtime`
+- `GET /api/v1/system/orchestration-plan`
 - `GET /api/v1/dishes`
 - `POST /api/v1/dishes`
+- `GET /api/v1/stores`
+- `POST /api/v1/stores`
+- `GET /api/v1/operators`
+- `POST /api/v1/operators`
+- `GET /api/v1/operations/snapshots`
+- `POST /api/v1/operations/snapshots`
+- `GET /api/v1/data-assets`
+- `POST /api/v1/data-assets`
+- `GET /api/v1/data-assets/build-summary`
+- `POST /api/v1/data-assets/materialize-preview`
+- `POST /api/v1/data-assets/materialize`
 - `GET /api/v1/standards`
 - `POST /api/v1/standards`
 - `GET /api/v1/production/events`
 - `POST /api/v1/production/events`
 - `POST /api/v1/vision/dish-recognition`
+
+## 今日已落地成果（可视化）
+
+```mermaid
+flowchart LR
+    A[Dish / Standard] --> B[Production Event]
+    S[Store] --> B
+    O[Operator] --> B
+    B --> Q[Quality Decision Event]
+    S --> OPS[Operation Snapshot]
+    O --> OPS
+    B --> DAS[Data Asset Build Summary]
+    OPS --> DAS
+    DAS --> PRE[Materialize Preview]
+    PRE --> MAT[Materialized Data Asset]
+    MAT --> AE[Asset Materialized Event]
+    MAT --> LIN[Lineage]
+    LIN --> PIDs[production_event_ids]
+    LIN --> OIDs[operation_snapshot_ids]
+```
+
+这张图对应今天已经落到代码里的链路，不是 PPT 许愿。
+
+## 当前落地状态
+
+### 已落地代码骨架
+- `dish`
+- `standard`
+- `production_event`
+- `store`
+- `operator`
+- `store_operation_snapshot`
+- `data_asset`
+- `agent runtime overview`
+- `orchestration plan`
+- `data asset materialization`
+- `data asset lineage`
+- `asset materialized event`
+
+### 当前最像样的一条链
+```text
+store / operator
+  -> production event
+  -> quality decision
+  -> operation snapshot
+  -> data asset summary
+  -> materialize preview
+  -> materialized data asset
+  -> asset event
+  -> lineage tracking
+```
 
 ## 商业逻辑
 
