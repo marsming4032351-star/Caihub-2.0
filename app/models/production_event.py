@@ -14,8 +14,10 @@ class ProductionEvent(Base):
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
     store_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    store_code: Mapped[str] = mapped_column(String(64), nullable=False, index=True, default="")
     dish_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     operator_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    operator_code: Mapped[str] = mapped_column(String(64), nullable=False, index=True, default="")
     image_url: Mapped[str] = mapped_column(Text, nullable=False)
     lighting_profile: Mapped[str] = mapped_column(String(120), nullable=False)
     camera_profile: Mapped[str] = mapped_column(String(120), nullable=False)

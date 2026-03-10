@@ -42,9 +42,9 @@ def test_create_and_list_production_events(tmp_path: Path) -> None:
         create_response = client.post(
             "/api/v1/production/events",
             json={
-                "store_id": "store-sh-001",
+                "store_code": "store-sh-001",
                 "dish_id": "dish-kungpao-001",
-                "operator_id": "chef-ming",
+                "operator_code": "chef-ming",
                 "capture": {
                     "image_url": "https://example.com/kungpao.jpg",
                     "lighting_profile": "5600K-standard",
@@ -72,6 +72,8 @@ def test_create_and_list_production_events(tmp_path: Path) -> None:
         )
         created = create_response.json()
         assert created["dish_id"] == "dish-kungpao-001"
+        assert created["store_code"] == "store-sh-001"
+        assert created["operator_code"] == "chef-ming"
         assert created["quality_result"]["standard_dish_key"] == "dish-kungpao-001"
         assert created["quality_result"]["pass_decision"] is True
         assert created["quality_result"]["plating_score"] >= 0.8

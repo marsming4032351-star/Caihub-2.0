@@ -36,8 +36,10 @@ class ProductionEventService:
         )
         event = ProductionEvent(
             store_id=payload.store_id,
+            store_code=payload.store_code,
             dish_id=payload.dish_id,
             operator_id=payload.operator_id,
+            operator_code=payload.operator_code,
             image_url=payload.capture.image_url,
             lighting_profile=payload.capture.lighting_profile,
             camera_profile=payload.capture.camera_profile,
@@ -66,8 +68,10 @@ class ProductionEventService:
         return ProductionEventRead(
             id=event.id,
             store_id=event.store_id,
+            store_code=event.store_code or event.store_id,
             dish_id=event.dish_id,
             operator_id=event.operator_id,
+            operator_code=event.operator_code or event.operator_id,
             capture={
                 "image_url": event.image_url,
                 "lighting_profile": event.lighting_profile,
