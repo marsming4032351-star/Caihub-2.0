@@ -38,3 +38,15 @@ class DataAssetBuildSummary(BaseModel):
     generated_quality_summary: str
     generated_ops_summary: str
     suggested_training_value_score: float
+
+
+class DataAssetMaterializationRequest(BaseModel):
+    asset_type: str | None = Field(default=None, max_length=64)
+    marketing_summary: str | None = Field(default=None, max_length=4000)
+    knowledge_refs: list[str] = Field(default_factory=list)
+    api_export_ready: bool = False
+
+
+class DataAssetMaterializationPreview(BaseModel):
+    asset_payload: DataAssetCreate
+    rationale: list[str] = Field(default_factory=list)

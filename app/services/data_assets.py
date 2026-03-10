@@ -1,7 +1,13 @@
 from app.repositories.data_asset import DataAssetRepository
 from app.repositories.operations import StoreOperationSnapshotRepository
 from app.repositories.production_event import ProductionEventRepository
-from app.schemas.data_asset import DataAssetBuildSummary, DataAssetCreate, DataAssetRead
+from app.schemas.data_asset import (
+    DataAssetBuildSummary,
+    DataAssetCreate,
+    DataAssetMaterializationPreview,
+    DataAssetMaterializationRequest,
+    DataAssetRead,
+)
 
 
 class DataAssetService:
@@ -51,3 +57,36 @@ class DataAssetService:
             generated_ops_summary=ops_summary,
             suggested_training_value_score=round(score, 2),
         )
+
+    def build_materialization_preview(
+        self,
+        request: DataAssetMaterializationRequest,
+    ) -> DataAssetMaterializationPreview:
+        summary = self.build_summary()
+        payload = DataAssetCreate(
+            asset_type=request.asset_type or summary.recommended_asset_type,
+            source_domains=["production", "operations"],
+            quality_summary=summary.generated_quality_summary,
+            ops_summary=summary.generated_ops_summary,
+            marketing_summary=request.marketing_summary,
+            knowledge_refs=request.knowledge_refs,
+            training_value_score=summary.suggested_training_value_score,
+            api_export_ready=request.api_export_ready,
+        )
+        rationale = [
+            f"Included {summary.production_event_count} production events.",
+            f"Included {summary.operation_snapshot_count} operation snapshots.",
+            f"Recommended asset type: {payload.asset_type}.",
+        ]
+        return DataAssetMaterializationPreview(
+            asset_payload=payload,
+            rationale=rationale,
+        )
+
+    def materialize_asset(
+        self,
+        request: DataAssetMaterializationRequest,
+    ) -> DataAssetRead:
+        preview = self.build_materialization_preview(request)
+        asset = self.repository.create(preview.asset_payload)
+        return DataAssetRead.model_validate(asset)

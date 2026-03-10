@@ -1,7 +1,13 @@
 from fastapi import APIRouter, Depends, status
 
 from app.api.dependencies import get_data_asset_service
-from app.schemas.data_asset import DataAssetBuildSummary, DataAssetCreate, DataAssetRead
+from app.schemas.data_asset import (
+    DataAssetBuildSummary,
+    DataAssetCreate,
+    DataAssetMaterializationPreview,
+    DataAssetMaterializationRequest,
+    DataAssetRead,
+)
 from app.services.data_assets import DataAssetService
 
 router = APIRouter()
@@ -36,3 +42,28 @@ def build_data_asset_summary(
     service: DataAssetService = Depends(get_data_asset_service),
 ) -> DataAssetBuildSummary:
     return service.build_summary()
+
+
+@router.post(
+    "/materialize-preview",
+    response_model=DataAssetMaterializationPreview,
+    summary="Preview a materialized data asset payload",
+)
+def preview_data_asset_materialization(
+    payload: DataAssetMaterializationRequest,
+    service: DataAssetService = Depends(get_data_asset_service),
+) -> DataAssetMaterializationPreview:
+    return service.build_materialization_preview(payload)
+
+
+@router.post(
+    "/materialize",
+    response_model=DataAssetRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Materialize a data asset from current production and operations signals",
+)
+def materialize_data_asset(
+    payload: DataAssetMaterializationRequest,
+    service: DataAssetService = Depends(get_data_asset_service),
+) -> DataAssetRead:
+    return service.materialize_asset(payload)
