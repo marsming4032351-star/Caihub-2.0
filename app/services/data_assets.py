@@ -1,3 +1,5 @@
+from app.events.asset import data_asset_materialized_event
+from app.events.base import DomainEvent
 from app.repositories.data_asset import DataAssetRepository
 from app.repositories.operations import StoreOperationSnapshotRepository
 from app.repositories.production_event import ProductionEventRepository
@@ -86,7 +88,13 @@ class DataAssetService:
     def materialize_asset(
         self,
         request: DataAssetMaterializationRequest,
-    ) -> DataAssetRead:
+    ) -> tuple[DataAssetRead, DomainEvent]:
         preview = self.build_materialization_preview(request)
         asset = self.repository.create(preview.asset_payload)
-        return DataAssetRead.model_validate(asset)
+        read_model = DataAssetRead.model_validate(asset)
+        event = data_asset_materialized_event(
+            asset_id=str(read_model.id),
+            asset_type=read_model.asset_type,
+            training_value_score=read_model.training_value_score,
+        )
+        return read_model, event

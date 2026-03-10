@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Response, status
 
 from app.api.dependencies import get_data_asset_service
 from app.schemas.data_asset import (
@@ -64,6 +64,9 @@ def preview_data_asset_materialization(
 )
 def materialize_data_asset(
     payload: DataAssetMaterializationRequest,
+    response: Response,
     service: DataAssetService = Depends(get_data_asset_service),
 ) -> DataAssetRead:
-    return service.materialize_asset(payload)
+    created, event = service.materialize_asset(payload)
+    response.headers["X-CaiHub-Asset-Event"] = event.event_type
+    return created

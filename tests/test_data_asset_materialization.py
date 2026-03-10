@@ -56,6 +56,7 @@ def test_preview_and_materialize_data_asset(tmp_path: Path) -> None:
             },
         )
         assert materialize_response.status_code == 201
+        assert materialize_response.headers["X-CaiHub-Asset-Event"] == "asset.data_asset.materialized"
         materialized = materialize_response.json()
         assert materialized["asset_type"] == "restaurant-knowledge-pack"
         assert materialized["api_export_ready"] is True
