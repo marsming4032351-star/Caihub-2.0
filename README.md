@@ -112,12 +112,33 @@ CaiHub CEO Agent
 - Data Mesh 视角的数据契约与数据流
 - agent / skill 注册与治理骨架
 - Alembic 迁移基础设施
+- OpenClaw 驱动的 AI+餐饮资讯日报自动化
 
 也就是说：
 
 ```text
 当前代码实现的是 AI Company 的平台底座，不是最终完整形态。
 ```
+
+## 当前可运行自动化
+
+仓库里现在已经包含一条可直接运行的 OpenClaw 自动化链路：
+
+```text
+ai-food-news Agent (Gemini)
+  -> 搜索 AI+餐饮资讯
+  -> 生成中文观察日报
+  -> Gmail 自动发信
+  -> launchd 开机补发 + 多时段兜底
+```
+
+对应文件：
+
+- `scripts/send_ai_food_news_email.py`
+- `scripts/run_ai_food_news_email.sh`
+- `deploy/ai.caihub.ai-food-news.plist`
+
+这个能力已经是可运行自动化，不是停留在文档层。
 
 ## 当前目录
 
