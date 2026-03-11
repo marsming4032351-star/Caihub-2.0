@@ -291,6 +291,7 @@ uvicorn app.main:app --reload
 - [OpenClaw 日报发信配置](docs/架构设计/OpenClaw_日报发信配置.md)
 - [OpenClaw 日报补发方案](docs/架构设计/OpenClaw_日报补发方案.md)
 - [OpenClaw 周报自动化方案](docs/架构设计/OpenClaw_周报自动化方案.md)
+- [OpenClaw 资讯智能体架构图](docs/架构设计/OpenClaw_资讯智能体架构图.md)
 - [流程图](docs/架构设计/流程图.md)
 - [架构总图](docs/架构设计/架构总图.md)
 - [技术实施说明](docs/架构设计/技术实施说明.md)
