@@ -71,7 +71,7 @@ class Settings:
     smtp_port: int
     smtp_username: str
     smtp_password: str
-    recipient: str
+    recipients: list[str]
     openclaw_agent: str
     openclaw_to: str
     subject_prefix: str
@@ -104,13 +104,22 @@ def get_required_env(name: str) -> str:
     return value
 
 
+def load_recipients() -> list[str]:
+    recipients_value = os.getenv("AI_FOOD_NEWS_RECIPIENTS", "").strip()
+    if recipients_value:
+        recipients = [item.strip() for item in recipients_value.split(",") if item.strip()]
+        if recipients:
+            return recipients
+    return [get_required_env("AI_FOOD_NEWS_RECIPIENT")]
+
+
 def load_settings() -> Settings:
     return Settings(
         smtp_host=os.getenv("AI_FOOD_NEWS_SMTP_HOST", "smtp.gmail.com"),
         smtp_port=int(os.getenv("AI_FOOD_NEWS_SMTP_PORT", "587")),
         smtp_username=get_required_env("AI_FOOD_NEWS_SMTP_USERNAME"),
         smtp_password=get_required_env("AI_FOOD_NEWS_SMTP_PASSWORD"),
-        recipient=get_required_env("AI_FOOD_NEWS_RECIPIENT"),
+        recipients=load_recipients(),
         openclaw_agent=os.getenv("AI_FOOD_NEWS_AGENT", "ai-food-news"),
         openclaw_to=os.getenv("AI_FOOD_NEWS_TO", "+8613900000013"),
         subject_prefix=os.getenv("AI_FOOD_NEWS_SUBJECT_PREFIX", "今日 AI+餐饮观察"),
@@ -163,14 +172,14 @@ def send_email(settings: Settings, body: str) -> None:
     today = datetime.now().strftime("%Y-%m-%d")
     message = EmailMessage()
     message["From"] = settings.smtp_username
-    message["To"] = settings.recipient
+    message["To"] = ", ".join(settings.recipients)
     message["Subject"] = f"{settings.subject_prefix} | {today}"
     message.set_content(body)
 
     with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=30) as server:
         server.starttls()
         server.login(settings.smtp_username, settings.smtp_password)
-        server.send_message(message)
+        server.send_message(message, to_addrs=settings.recipients)
 
 
 def already_sent_today(state_file: str) -> bool:
@@ -189,8 +198,9 @@ def mark_sent_today(state_file: str) -> None:
 def main() -> None:
     load_env_file()
     settings = load_settings()
+    recipients_label = ", ".join(settings.recipients)
     if already_sent_today(settings.state_file):
-        print(f"Skip sending: already sent today to {settings.recipient}")
+        print(f"Skip sending: already sent today to {recipients_label}")
         return
     prompt = load_prompt(settings.prompt_file)
     body = run_openclaw(
@@ -200,7 +210,7 @@ def main() -> None:
     )
     send_email(settings, body)
     mark_sent_today(settings.state_file)
-    print(f"Email sent to {settings.recipient}")
+    print(f"Email sent to {recipients_label}")
 
 
 if __name__ == "__main__":

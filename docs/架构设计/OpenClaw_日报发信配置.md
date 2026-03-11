@@ -31,6 +31,7 @@ AI_FOOD_NEWS_SMTP_PORT=587
 AI_FOOD_NEWS_SMTP_USERNAME=你的 Gmail 地址
 AI_FOOD_NEWS_SMTP_PASSWORD=你的 Gmail App Password
 AI_FOOD_NEWS_RECIPIENT=收件邮箱地址
+AI_FOOD_NEWS_RECIPIENTS=你的 Gmail 地址,605229578@qq.com
 AI_FOOD_NEWS_AGENT=ai-food-news
 AI_FOOD_NEWS_TO=+8613900000013
 AI_FOOD_NEWS_SUBJECT_PREFIX=今日 AI+餐饮观察
@@ -45,6 +46,7 @@ export AI_FOOD_NEWS_SMTP_PORT="587"
 export AI_FOOD_NEWS_SMTP_USERNAME="你的 Gmail 地址"
 export AI_FOOD_NEWS_SMTP_PASSWORD="你的 Gmail App Password"
 export AI_FOOD_NEWS_RECIPIENT="收件邮箱地址"
+export AI_FOOD_NEWS_RECIPIENTS="你的 Gmail 地址,605229578@qq.com"
 export AI_FOOD_NEWS_AGENT="ai-food-news"
 export AI_FOOD_NEWS_TO="+8613900000013"
 export AI_FOOD_NEWS_SUBJECT_PREFIX="今日 AI+餐饮观察"
@@ -58,6 +60,8 @@ export AI_FOOD_NEWS_SUBJECT_PREFIX="今日 AI+餐饮观察"
   Gmail App Password，不是 Gmail 登录密码
 - `AI_FOOD_NEWS_RECIPIENT`
   收件人邮箱，可以填你自己的 Gmail
+- `AI_FOOD_NEWS_RECIPIENTS`
+  多收件人模式，多个邮箱用英文逗号分隔；设置后会优先于 `AI_FOOD_NEWS_RECIPIENT`
 - `AI_FOOD_NEWS_TO`
   OpenClaw 用来生成独立 session key 的占位号码
 
