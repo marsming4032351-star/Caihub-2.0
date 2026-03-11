@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import smtplib
 import subprocess
+import time
 from dataclasses import dataclass
 from datetime import datetime
 from email.message import EmailMessage
@@ -77,24 +78,32 @@ class Settings:
     subject_prefix: str
     prompt_file: str | None
     state_file: str
+    max_retries: int
 
 
 def load_env_file() -> None:
+    shared_env_file = Path(
+        os.getenv(
+            "AI_FOOD_NEWS_SHARED_ENV_FILE",
+            str(Path.home() / ".openclaw" / "ai-food-news-shared.env"),
+        )
+    ).expanduser()
     env_file = Path(
         os.getenv(
             "AI_FOOD_NEWS_ENV_FILE",
             str(Path.home() / ".openclaw" / "ai-food-news.env"),
         )
     ).expanduser()
-    if not env_file.exists():
-        return
 
-    for raw_line in env_file.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
+    for file_path in (shared_env_file, env_file):
+        if not file_path.exists():
             continue
-        key, value = line.split("=", 1)
-        os.environ.setdefault(key.strip(), value.strip())
+        for raw_line in file_path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip())
 
 
 def get_required_env(name: str) -> str:
@@ -128,6 +137,7 @@ def load_settings() -> Settings:
             "AI_FOOD_NEWS_STATE_FILE",
             str(Path.home() / ".openclaw" / "state" / "ai-food-news-last-sent.txt"),
         ),
+        max_retries=int(os.getenv("AI_FOOD_NEWS_MAX_RETRIES", "3")),
     )
 
 
@@ -139,7 +149,59 @@ def load_prompt(prompt_file: str | None) -> str:
     return path.read_text(encoding="utf-8").strip()
 
 
-def run_openclaw(agent: str, to: str, prompt: str) -> str:
+def sanitize_openclaw_output(raw_output: str) -> str:
+    body = raw_output.strip()
+    if not body:
+        raise RuntimeError("OpenClaw returned empty output.")
+
+    # Drop tool/debug chatter before the actual mail body.
+    title_index = body.find("标题：")
+    if title_index != -1:
+        body = body[title_index:].strip()
+
+    error_markers = (
+        "Codex error:",
+        '"type":"server_error"',
+        "OpenClaw agent command failed.",
+    )
+    if any(marker in body for marker in error_markers):
+        raise RuntimeError(f"OpenClaw returned an invalid response:\n{body}")
+
+    required_markers = (
+        "标题：",
+        "开头导语：",
+        "一句话总结：",
+        "今日值得关注的 5 条资讯：",
+        "本周总览：",
+        "本周 7 条重点资讯：",
+        "本周一句结论：",
+    )
+    blocked_markers = (
+        "--final",
+        "写入输出文件",
+        "提交 git",
+        "新增提交",
+        "关键提交",
+        "我继续把",
+        "做完我会跑一遍",
+        "继续做完了",
+        "终端预览效果",
+        "脚本多了一个",
+        "以后你基本只要说一句",
+    )
+    if any(marker in body for marker in blocked_markers):
+        raise RuntimeError(f"OpenClaw output contains blocked workflow chatter:\n{body}")
+
+    if not body.startswith("标题：") and "今日 AI+餐饮" not in body and "本周 AI+餐饮" not in body:
+        raise RuntimeError(f"OpenClaw output does not look like a newsletter body:\n{body}")
+
+    if not any(marker in body for marker in required_markers):
+        raise RuntimeError(f"OpenClaw output is missing expected newsletter sections:\n{body}")
+
+    return body
+
+
+def run_openclaw(agent: str, to: str, prompt: str, max_retries: int) -> str:
     command = [
         "openclaw",
         "agent",
@@ -150,22 +212,30 @@ def run_openclaw(agent: str, to: str, prompt: str) -> str:
         "--message",
         prompt,
     ]
-    result = subprocess.run(
-        command,
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        raise RuntimeError(
-            "OpenClaw agent command failed.\n"
-            f"STDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
+    last_error: RuntimeError | None = None
+    for attempt in range(1, max_retries + 1):
+        result = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
         )
+        if result.returncode == 0:
+            try:
+                return sanitize_openclaw_output(result.stdout)
+            except RuntimeError as exc:
+                last_error = exc
+        else:
+            last_error = RuntimeError(
+                "OpenClaw agent command failed.\n"
+                f"STDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
+            )
 
-    body = result.stdout.strip()
-    if not body:
-        raise RuntimeError("OpenClaw returned empty output.")
-    return body
+        if attempt < max_retries:
+            time.sleep(2 * attempt)
+
+    assert last_error is not None
+    raise last_error
 
 
 def send_email(settings: Settings, body: str) -> None:
@@ -207,6 +277,7 @@ def main() -> None:
         agent=settings.openclaw_agent,
         to=settings.openclaw_to,
         prompt=prompt,
+        max_retries=settings.max_retries,
     )
     send_email(settings, body)
     mark_sent_today(settings.state_file)

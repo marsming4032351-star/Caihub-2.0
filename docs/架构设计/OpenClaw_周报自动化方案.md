@@ -20,15 +20,23 @@ ai-food-news Agent (Gemini)
 
 ## 3. 周报环境文件
 
-建议创建：
+建议只在共享文件里维护 SMTP 和收件人：
 
 ```bash
-cat > ~/.openclaw/ai-food-news-weekly.env <<'EOF'
+cat > ~/.openclaw/ai-food-news-shared.env <<'EOF'
 AI_FOOD_NEWS_SMTP_HOST=smtp.gmail.com
 AI_FOOD_NEWS_SMTP_PORT=587
 AI_FOOD_NEWS_SMTP_USERNAME=你的 Gmail 地址
 AI_FOOD_NEWS_SMTP_PASSWORD=你的 Gmail App Password
-AI_FOOD_NEWS_RECIPIENT=收件邮箱地址
+AI_FOOD_NEWS_RECIPIENT=你的 Gmail 地址
+AI_FOOD_NEWS_RECIPIENTS=你的 Gmail 地址,84369563@qq.com,605229578@qq.com,315865302@qq.com
+EOF
+```
+
+周报自己的文件只保留周报参数：
+
+```bash
+cat > ~/.openclaw/ai-food-news-weekly.env <<'EOF'
 AI_FOOD_NEWS_AGENT=ai-food-news
 AI_FOOD_NEWS_TO=+8613900000020
 AI_FOOD_NEWS_SUBJECT_PREFIX=本周 AI+餐饮周报
@@ -64,6 +72,7 @@ launchctl load ~/Library/LaunchAgents/ai.caihub.ai-food-news-weekly.plist
 ## 7. 说明
 
 - 日报和周报共用同一个 Python 发信脚本
+- 两者会先读取 `~/.openclaw/ai-food-news-shared.env`
 - 区别只在于：
   - 使用不同 env 文件
   - 使用不同 prompt 文件
