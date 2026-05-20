@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import os
+import shutil
 import smtplib
 import subprocess
 import time
+import uuid
 from dataclasses import dataclass
 from datetime import datetime
 from email.message import EmailMessage
 from pathlib import Path
+from glob import glob
 
 
 DEFAULT_PROMPT = """请帮我生成一封可直接发送的「今日 AI+餐饮观察」邮件正文。
@@ -73,8 +76,11 @@ class Settings:
     smtp_username: str
     smtp_password: str
     recipients: list[str]
-    openclaw_agent: str
+    alert_recipients: list[str]
+    openclaw_bin: str
+    openclaw_agents: list[str]
     openclaw_to: str
+    openclaw_session_id: str
     subject_prefix: str
     prompt_file: str | None
     state_file: str
@@ -122,15 +128,83 @@ def load_recipients() -> list[str]:
     return [get_required_env("AI_FOOD_NEWS_RECIPIENT")]
 
 
+def load_alert_recipients(smtp_username: str) -> list[str]:
+    recipients_value = os.getenv("AI_FOOD_NEWS_ALERT_RECIPIENTS", "").strip()
+    if recipients_value:
+        recipients = [item.strip() for item in recipients_value.split(",") if item.strip()]
+        if recipients:
+            return recipients
+    return [smtp_username]
+
+
+def load_openclaw_agents() -> list[str]:
+    raw = os.getenv("AI_FOOD_NEWS_AGENT", "ai-food-news").strip()
+    agents = [item.strip() for item in raw.split(",") if item.strip()]
+    if not agents:
+        raise RuntimeError("Missing OpenClaw agent configuration: AI_FOOD_NEWS_AGENT")
+    return agents
+
+
+def resolve_openclaw_bin() -> str:
+    configured = os.getenv("AI_FOOD_NEWS_OPENCLAW_BIN", "").strip()
+    if configured:
+        return str(Path(configured).expanduser())
+
+    resolved = shutil.which("openclaw")
+    if resolved:
+        return resolved
+
+    candidates = sorted(
+        glob(str(Path.home() / ".nvm" / "versions" / "node" / "*" / "bin" / "openclaw"))
+    )
+    if candidates:
+        return candidates[-1]
+
+    raise RuntimeError(
+        "Unable to locate the 'openclaw' binary. Set AI_FOOD_NEWS_OPENCLAW_BIN explicitly."
+    )
+
+
+def derive_session_target(base_to: str) -> str:
+    scope = os.getenv("AI_FOOD_NEWS_SESSION_SCOPE", "daily").strip().lower()
+    if scope != "daily":
+        return base_to
+
+    digits = "".join(ch for ch in base_to if ch.isdigit())
+    if not digits:
+        return base_to
+
+    today_suffix = datetime.now().strftime("%y%m%d")
+    derived_digits = f"{digits[:-6]}{today_suffix}" if len(digits) > 6 else today_suffix
+    return f"+{derived_digits}"
+
+
+def derive_session_id(agent: str) -> str:
+    scope = os.getenv("AI_FOOD_NEWS_SESSION_SCOPE", "daily").strip().lower()
+    if scope in {"per-run", "run", "retry-safe"}:
+        return str(uuid.uuid4())
+
+    if scope != "daily":
+        return str(uuid.uuid4())
+
+    seed = f"{agent}:{datetime.now().strftime('%Y-%m-%d')}"
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, seed))
+
+
 def load_settings() -> Settings:
+    openclaw_agents = load_openclaw_agents()
+    smtp_username = get_required_env("AI_FOOD_NEWS_SMTP_USERNAME")
     return Settings(
         smtp_host=os.getenv("AI_FOOD_NEWS_SMTP_HOST", "smtp.gmail.com"),
         smtp_port=int(os.getenv("AI_FOOD_NEWS_SMTP_PORT", "587")),
-        smtp_username=get_required_env("AI_FOOD_NEWS_SMTP_USERNAME"),
+        smtp_username=smtp_username,
         smtp_password=get_required_env("AI_FOOD_NEWS_SMTP_PASSWORD"),
         recipients=load_recipients(),
-        openclaw_agent=os.getenv("AI_FOOD_NEWS_AGENT", "ai-food-news"),
-        openclaw_to=os.getenv("AI_FOOD_NEWS_TO", "+8613900000013"),
+        alert_recipients=load_alert_recipients(smtp_username),
+        openclaw_bin=resolve_openclaw_bin(),
+        openclaw_agents=openclaw_agents,
+        openclaw_to=derive_session_target(os.getenv("AI_FOOD_NEWS_TO", "+8613900000013")),
+        openclaw_session_id=derive_session_id(openclaw_agents[0]),
         subject_prefix=os.getenv("AI_FOOD_NEWS_SUBJECT_PREFIX", "今日 AI+餐饮观察"),
         prompt_file=os.getenv("AI_FOOD_NEWS_PROMPT_FILE") or None,
         state_file=os.getenv(
@@ -201,12 +275,21 @@ def sanitize_openclaw_output(raw_output: str) -> str:
     return body
 
 
-def run_openclaw(agent: str, to: str, prompt: str, max_retries: int) -> str:
+def run_openclaw(
+    openclaw_bin: str,
+    agent: str,
+    to: str,
+    session_id: str,
+    prompt: str,
+    max_retries: int,
+) -> str:
     command = [
-        "openclaw",
+        openclaw_bin,
         "agent",
         "--agent",
         agent,
+        "--session-id",
+        session_id,
         "--to",
         to,
         "--message",
@@ -214,8 +297,12 @@ def run_openclaw(agent: str, to: str, prompt: str, max_retries: int) -> str:
     ]
     last_error: RuntimeError | None = None
     for attempt in range(1, max_retries + 1):
+        attempt_session_id = str(uuid.uuid5(uuid.NAMESPACE_URL, f"{session_id}:attempt:{attempt}"))
+        attempt_command = command.copy()
+        session_id_index = attempt_command.index("--session-id") + 1
+        attempt_command[session_id_index] = attempt_session_id
         result = subprocess.run(
-            command,
+            attempt_command,
             check=False,
             capture_output=True,
             text=True,
@@ -238,18 +325,70 @@ def run_openclaw(agent: str, to: str, prompt: str, max_retries: int) -> str:
     raise last_error
 
 
+def run_openclaw_with_fallbacks(settings: Settings, prompt: str) -> str:
+    errors: list[str] = []
+    for agent in settings.openclaw_agents:
+        try:
+            return run_openclaw(
+                openclaw_bin=settings.openclaw_bin,
+                agent=agent,
+                to=settings.openclaw_to,
+                session_id=derive_session_id(agent),
+                prompt=prompt,
+                max_retries=settings.max_retries,
+            )
+        except RuntimeError as exc:
+            errors.append(f"[{agent}] {exc}")
+
+    raise RuntimeError("All OpenClaw agents failed.\n" + "\n\n".join(errors))
+
+
 def send_email(settings: Settings, body: str) -> None:
     today = datetime.now().strftime("%Y-%m-%d")
+    send_email_message(
+        settings=settings,
+        recipients=settings.recipients,
+        subject=f"{settings.subject_prefix} | {today}",
+        body=body,
+    )
+
+
+def send_email_message(settings: Settings, recipients: list[str], subject: str, body: str) -> None:
     message = EmailMessage()
     message["From"] = settings.smtp_username
-    message["To"] = ", ".join(settings.recipients)
-    message["Subject"] = f"{settings.subject_prefix} | {today}"
+    message["To"] = ", ".join(recipients)
+    message["Subject"] = subject
     message.set_content(body)
 
     with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=30) as server:
         server.starttls()
         server.login(settings.smtp_username, settings.smtp_password)
-        server.send_message(message, to_addrs=settings.recipients)
+        server.send_message(message, to_addrs=recipients)
+
+
+def send_failure_alert(settings: Settings, error: Exception) -> None:
+    now = datetime.now()
+    next_retry = now.replace(hour=9, minute=5, second=0, microsecond=0)
+    body = "\n".join(
+        [
+            "今日 AI+餐饮日报自动发送失败。",
+            "",
+            f"失败时间：{now.strftime('%Y-%m-%d %H:%M:%S')}",
+            f"尝试 Agent：{', '.join(settings.openclaw_agents)}",
+            f"主收件人：{', '.join(settings.recipients)}",
+            "",
+            "错误摘要：",
+            str(error),
+            "",
+            f"系统会继续按既有调度自动重试；最近一次补跑时间是 {next_retry.strftime('%Y-%m-%d %H:%M')}。",
+        ]
+    )
+    send_email_message(
+        settings=settings,
+        recipients=settings.alert_recipients,
+        subject=f"[告警] {settings.subject_prefix} 发送失败 | {now.strftime('%Y-%m-%d %H:%M')}",
+        body=body,
+    )
 
 
 def already_sent_today(state_file: str) -> bool:
@@ -272,16 +411,19 @@ def main() -> None:
     if already_sent_today(settings.state_file):
         print(f"Skip sending: already sent today to {recipients_label}")
         return
-    prompt = load_prompt(settings.prompt_file)
-    body = run_openclaw(
-        agent=settings.openclaw_agent,
-        to=settings.openclaw_to,
-        prompt=prompt,
-        max_retries=settings.max_retries,
-    )
-    send_email(settings, body)
-    mark_sent_today(settings.state_file)
-    print(f"Email sent to {recipients_label}")
+    try:
+        prompt = load_prompt(settings.prompt_file)
+        body = run_openclaw_with_fallbacks(settings, prompt)
+        send_email(settings, body)
+        mark_sent_today(settings.state_file)
+        print(f"Email sent to {recipients_label}")
+    except Exception as exc:
+        try:
+            send_failure_alert(settings, exc)
+            print(f"Failure alert sent to {', '.join(settings.alert_recipients)}")
+        except Exception as alert_exc:
+            print(f"Failure alert also failed: {alert_exc}")
+        raise
 
 
 if __name__ == "__main__":
