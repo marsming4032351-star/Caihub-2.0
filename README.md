@@ -241,6 +241,22 @@ store / operator
   -> lineage tracking
 ```
 
+## Agent 核心架构：ReAct + Tool Calling + Memory
+
+本次仓库新增了 Vision QA Agent（CaiBox 菜品出品质检 Agent）的最小 mock runtime，把 Agent 核心概念落到可运行接口中：
+
+- **ReAct**：记录质检过程中的 thought / action / observation。
+- **Tool Calling**：串联菜品识别、标准查询、视觉检测、温度检测、质检裁决和 Memory 读写工具。
+- **Memory**：把历史质量摘要和本次质检结果沉淀为可追踪的数据资产记录。
+
+演示接口：
+
+```text
+POST /api/v1/agents/vision-qa/inspect-demo
+```
+
+完整产品说明见：[Agent 核心架构文档](docs/agent-core-architecture.md)。
+
 ## 商业逻辑
 
 CaiHub 的商业模式由四层组成：
