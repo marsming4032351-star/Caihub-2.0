@@ -4,3 +4,8 @@
 .pytest_cache/
 __pycache__/
 *.py[cod]
+data/
+
+# Local knowledge and memory
+.obsidian/
+memory/

@@ -2,7 +2,7 @@ from app.agents.registry import list_agents
 from app.schemas.agent_runtime import AgentRuntimeOverview, AgentRuntimeStatus
 
 
-RUNTIME_READY_AGENT_IDS = {"ceo-agent"}
+RUNTIME_READY_AGENT_IDS = {"ceo-agent", "vision-qa-agent"}
 
 
 class AgentRuntimeService:

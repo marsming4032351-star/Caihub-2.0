@@ -34,5 +34,5 @@ def test_system_info() -> None:
 
         assert response.status_code == 200
         body = response.json()
-        assert body["app_name"] == "CaiHub Backend"
+        assert body["app_name"] == "CaiHub AI Company"
         assert body["version"] == "0.1.0"
