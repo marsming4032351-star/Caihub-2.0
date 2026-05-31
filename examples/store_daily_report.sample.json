@@ -1,0 +1,37 @@
+{
+  "schema": "caihub.example.store_daily_report.v1",
+  "sample_notice": "Fictional daily report for AI operations data asset examples.",
+  "report_id": "demo_store_daily_20260531",
+  "store_id": "demo_store_001",
+  "business_date": "2026-05-31",
+  "summary": {
+    "orders_count": 128,
+    "quality_checks_count": 96,
+    "quality_pass_rate": 0.927,
+    "average_check_seconds": 14.8,
+    "top_quality_issue": "plating_garnish_missing"
+  },
+  "dish_metrics": [
+    {
+      "dish_id": "demo_dish_roast_duck_001",
+      "produced_count": 42,
+      "qa_pass_count": 39,
+      "qa_review_count": 3
+    },
+    {
+      "dish_id": "demo_dish_noodle_002",
+      "produced_count": 36,
+      "qa_pass_count": 35,
+      "qa_review_count": 1
+    }
+  ],
+  "agent_notes": {
+    "store_ops_agent": "Lunch peak was stable. Review garnish preparation before dinner service.",
+    "data_asset_agent": "Daily report can be linked with production events and quality decisions for trend analysis."
+  },
+  "data_asset_tags": [
+    "store_daily_report",
+    "ops_snapshot",
+    "ai_operations_asset"
+  ]
+}

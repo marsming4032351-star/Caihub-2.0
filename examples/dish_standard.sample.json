@@ -1,0 +1,36 @@
+{
+  "schema": "caihub.example.dish_standard.v1",
+  "sample_notice": "Fictional, anonymized sample data for documentation and tests.",
+  "dish": {
+    "dish_id": "demo_dish_roast_duck_001",
+    "name": "Sample Crispy Roast Duck",
+    "category": "signature_main",
+    "version": "2026.05-demo"
+  },
+  "standard": {
+    "target_weight_grams": {
+      "min": 680,
+      "max": 760
+    },
+    "plating": {
+      "plate_type": "white_round_plate_demo",
+      "slice_count": 18,
+      "garnish": ["demo_cucumber", "demo_scallion"]
+    },
+    "visual_rules": {
+      "skin_color": "golden_brown",
+      "surface_gloss": "medium_high",
+      "burnt_area_ratio_max": 0.03,
+      "missing_garnish_allowed": false
+    },
+    "temperature_celsius": {
+      "serving_min": 58,
+      "serving_max": 68
+    }
+  },
+  "data_asset_tags": [
+    "dish_standard",
+    "vision_qa",
+    "menu_rnd_knowledge"
+  ]
+}

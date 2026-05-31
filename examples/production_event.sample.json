@@ -1,0 +1,31 @@
+{
+  "schema": "caihub.example.production_event.v1",
+  "sample_notice": "Fictional, anonymized sample data. No real store, staff, or device identifiers are included.",
+  "event_id": "demo_evt_20260531_0001",
+  "store_id": "demo_store_001",
+  "station_id": "demo_kitchen_station_a",
+  "operator_id": "demo_operator_007",
+  "dish_id": "demo_dish_roast_duck_001",
+  "occurred_at": "2026-05-31T11:42:00+08:00",
+  "event_type": "dish_ready_for_quality_check",
+  "source": {
+    "device_id": "demo_caibox_001",
+    "image_uri": "https://example.invalid/caihub/demo/dish-ready-0001.jpg",
+    "sensor_snapshot_id": "demo_sensor_snapshot_0001"
+  },
+  "observations": {
+    "estimated_weight_grams": 724,
+    "serving_temperature_celsius": 62.4,
+    "detected_components": [
+      "roast_duck",
+      "cucumber",
+      "scallion",
+      "sauce_cup"
+    ]
+  },
+  "assetization": {
+    "candidate_asset_type": "production_quality_event",
+    "retention_policy": "demo_only",
+    "lineage_refs": ["demo_dish_roast_duck_001", "demo_store_daily_20260531"]
+  }
+}

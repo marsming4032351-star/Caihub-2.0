@@ -313,6 +313,14 @@ uvicorn app.main:app --reload
 - [技术实施说明](docs/架构设计/技术实施说明.md)
 - [业务版项目说明](docs/架构设计/业务版项目说明.md)
 
+## Open Source Readiness
+
+- [License](LICENSE)
+- [Contributing Guide](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
+- [Quickstart](docs/quickstart.md)
+- [Anonymized Examples](examples/)
+
 ## 下一步重点
 
 - 建立 `store` / `operator` 领域

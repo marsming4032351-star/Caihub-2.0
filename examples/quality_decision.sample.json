@@ -1,0 +1,34 @@
+{
+  "schema": "caihub.example.quality_decision.v1",
+  "sample_notice": "Fictional visual QA decision. Image references use placeholder domains only.",
+  "decision_id": "demo_quality_decision_0001",
+  "event_id": "demo_evt_20260531_0001",
+  "dish_id": "demo_dish_roast_duck_001",
+  "store_id": "demo_store_001",
+  "decided_at": "2026-05-31T11:42:16+08:00",
+  "decision": "review_required",
+  "confidence": 0.86,
+  "vision_findings": [
+    {
+      "rule": "skin_color",
+      "status": "pass",
+      "score": 0.94
+    },
+    {
+      "rule": "plating_garnish",
+      "status": "review",
+      "score": 0.71,
+      "reason": "Expected garnish appears partially missing in the demo image."
+    }
+  ],
+  "recommended_action": {
+    "owner": "demo_shift_lead",
+    "action": "Add missing garnish and capture a follow-up quality check image.",
+    "sla_minutes": 5
+  },
+  "memory_update": {
+    "write_summary": true,
+    "asset_key": "demo_store_001/demo_dish_roast_duck_001/plating_garnish",
+    "learning_signal": "Track repeated garnish misses during lunch peak."
+  }
+}
